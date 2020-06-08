@@ -1,0 +1,30 @@
+<!-- #######  THIS IS A COMMENT - Visible only in the source editor #########-->
+
+
+
+<html>
+   <head>
+      <title>Eye Tracking Exeperiment</title>
+   </head>
+   <body>
+      <form action="save_to_log.php" method="POST">
+	  <input type="hidden" name="submitted" value="true">
+		<h2>Welcome to my experieriment</h2>
+		<p>The aim of this experieriment is to collect data for a noval early warning system for neurodegenerative dieases.</p>
+
+		<h2>Instructions</h2>
+		<p>1. Complete the below form with the relevent information</p>
+		<p>2. Complete calibration (Instructions on the next page)</p>
+		<p>3. View the slideshow and try to rememember the contents of the image</p>
+		<p>4. Fill in the final form</p>
+		
+		<h2>Please complete the below form</h2>
+		<p>Age:&nbsp;<input type="text" name="Age" required/></p>
+		<p>Have you been diagnosed with a neurodegererative disease? (Yes/No)&nbsp;<input type="text" name="yn" required/></p>
+		<p>If yes, please specify which disease:&nbsp;<input type="text" name="Diease_Name" /></p>
+		<p>How long ago were you diagnosed?&nbsp;<input type="text" name="Time" /></p>
+
+         <input type="submit"  value="Submit" />
+      </form>
+   </body>
+</html>

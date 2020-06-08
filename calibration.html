@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<!--
+This is an example HTML that shows how WebGazer can be used on a website.
+This file provides the additional features:
+  * An integrated, intuitive and sleek action bar with an informative "help" module accessible at all times
+  * Structured 9-point calibration system
+  * Accuracy measure of predictions based on calibration process
+  * Video feedback regarding face positioning
+  * Improved eye predictions visible to the user
+Instructions on use can be found in the README repository.
+-->
+<html>
+    <head>
+        <!-- <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8"> -->
+        <TITLE>Test</TITLE>
+        <link rel="stylesheet" type="text/css" href="./css/style.css">
+        <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <script async type="text/javascript" src="./webgazer.js"></script>
+		<script type="text/javascript" src="jquery.js"></script>
+		<script src="https://d3js.org/d3.v3.min.js"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			* {box-sizing: border-box;}
+			body {font-family: Verdana, sans-serif;}
+			.mySlides {display: none;}
+			img {vertical-align: middle;}
+
+			/* Slideshow container */
+			.slideshow-container {
+			  max-width: 850px;
+			  position: relative;
+			  margin: auto;
+			}
+
+			.active {
+			  background-color: #717171;
+			}
+
+	
+
+			@-webkit-keyframes fade {
+			  from {opacity: .4} 
+			  to {opacity: 1}
+			}
+
+			@keyframes fade {
+			  from {opacity: .4} 
+			  to {opacity: 1}
+			}
+
+			/* On smaller screens, decrease text size */
+			@media only screen and (max-width: 300px) {
+			  .text {font-size: 11px}
+			}
+		</style>
+    </head>
+    <body LANG="en-US" LINK="#0000ff" DIR="LTR">
+      <!-- <canvas id="plotting_canvas" width="500" height="500" style="cursor:crosshair;"></canvas> -->
+
+        <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="./node_modules/sweetalert/dist/sweetalert.min.js"></script>
+
+        <!-- Calibration points -->
+        <div class="calibrationDiv">
+            <input type="button" class="Calibration" id="Pt1"></input>
+            <input type="button" class="Calibration" id="Pt2"></input>
+            <input type="button" class="Calibration" id="Pt3"></input>
+            <input type="button" class="Calibration" id="Pt4"></input>
+            <input type="button" class="Calibration" id="Pt5"></input>
+            <input type="button" class="Calibration" id="Pt6"></input>
+            <input type="button" class="Calibration" id="Pt7"></input>
+            <input type="button" class="Calibration" id="Pt8"></input>
+            <input type="button" class="Calibration" id="Pt9"></input>
+        </div>
+
+
+		<div class="slideshow-container">
+
+		<div class="mySlides fade">
+		  <img src="http://vision.cs.uiuc.edu/pascal-sentences/aeroplane/2008_007095.jpg" style="width:100%">
+		</div>
+
+		<div class="mySlides fade">
+		  <img src="http://vision.cs.uiuc.edu/pascal-sentences/dog/2008_006511.jpg" style="width:100%">
+		</div>
+
+		<div class="mySlides fade">
+		  <img src="http://vision.cs.uiuc.edu/pascal-sentences/horse/2008_005642.jpg" style="width:100%">
+		</div>
+
+		<div class="mySlides fade">
+		  <img src="http://vision.cs.uiuc.edu/pascal-sentences/sofa/2008_008106.jpg" style="width:100%">
+		</div>
+
+		<div class="mySlides fade">
+		  <img src="http://vision.cs.uiuc.edu/pascal-sentences/chair/2008_003264.jpg" style="width:100%">
+		</div>
+	
+		<div class="mySlides fade">
+		  <img src="http://vision.cs.uiuc.edu/pascal-sentences/cat/2008_006999.jpg" style="width:100%">
+		</div>
+
+		<div class="mySlides fade">
+		  <img src="http://vision.cs.uiuc.edu/pascal-sentences/boat/2008_007599.jpg" style="width:100%">
+		</div>
+		
+		<div class="mySlides fade">
+		  <img src="http://vision.cs.uiuc.edu/pascal-sentences/aeroplane/2008_008446.jpg" style="width:100%">
+		</div>
+				
+		<div class="mySlides fade">
+		  <img src="http://vision.cs.uiuc.edu/pascal-sentences/cat/2008_000116.jpg" style="width:100%">
+		</div>
+		
+		<div class="mySlides fade">
+		  <img src="http://vision.cs.uiuc.edu/pascal-sentences/cow/2008_007031.jpg" style="width:100%">
+		</div>
+		
+		</div>
+		<br>
+
+		<div style="text-align:center">
+		  <span class="dot"></span> 
+		  <span class="dot"></span> 
+		  <span class="dot"></span> 
+		</div>
+		<div 
+			
+			 style="
+			 text-align:center;
+			  top: 100px;
+			  left: 230px;
+			  position: absolute;
+			  z-index: -1;">
+			<h2> Calibration </h2>
+			<p>1. Adjust the position of your face so that it is highlighted in green in the viewer </p>
+			<p>2. Stare at your mouse cursor.</p>
+			<p>3. While stareing at your cursor, Click each of the red calibration mulitiple times</p>
+			<p>4. Look around the screen without moving your mouse. If the dot follows your eyes the press the below button</p> 
+			
+			<button onclick="showSlides()">Begin </button>	
+		</div>
+		<script>
+		var xData = [];
+		var yData = [];
+
+		window.onload = function() {
+
+			var localstorageLabel = 'webgazerGlobalData';
+			window.localStorage.setItem(localstorageLabel, null);
+
+			webgazer.setRegression('ridge') /* currently must set regression and tracker */
+			.setTracker('clmtrackr')
+			.begin()
+			.showPredictionPoints(true);
+			 /* shows a square every 100 milliseconds where current prediction is */
+
+			function checkIfReady() {
+			  
+				// Add the SVG component on the top of everything.
+				
+				webgazer.setGazeListener( collisionEyeListener );
+			}
+			setTimeout(checkIfReady,100);
+		  };
+
+		  window.onbeforeunload = function() {
+			webgazer.end(); //Uncomment if you want to save the data even if you reload the page.
+			//window.localStorage.clear(); //Comment out if you want to save data across different sessions
+		  }
+			
+	
+		
+		var collisionEyeListener = function(data, clock) {
+			if(!data)
+			  return;
+			
+			xData.push(data.x);
+			yData.push(data.y);
+
+	    };
+
+
+		var slideIndex = 0;
+			
+		function showSlides() {
+		  var i;
+		  var slides = document.getElementsByClassName("mySlides");
+		  for (i = 0; i < slides.length; i++) {
+			slides[i].style.display = "none";
+		  }
+		  slideIndex++;
+		  if (slideIndex > slides.length) { 
+		//  $.post('https://localhost/test/gazeData.php',{postxData:xData, postyData:yData})
+		  window.location.href = "https://localhost/test/gazeData.php?postxData=" + xData + "&postyData=" + yData; 
+		}
+		  slides[slideIndex-1].style.display = "block";
+
+		  setTimeout(showSlides, 2000); // Change image every 2 seconds
+		};
+
+		</script>
+        <!-- Latest compiled JavaScript -->
+        <script src="./js/resize_canvas.js"></script>
+        <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    </body>
+</html>
